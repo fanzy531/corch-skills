@@ -1,16 +1,22 @@
 # Changelog
 
+## 0.1.0 (2026-07-30)
+
+### Added
+- corch-action skill skeleton: MD → action CPT publishing workflow
+- optimize_images.py: auto-resize landscape to 1000w, portrait to 1200w, convert to JPG
+- ACF field mapping for action sections/repeater/gallery/outcomes
+- date_picker format note (Ymd required)
+
 ## 1.5.1 (2026-07-30)
 
 ### Fixed
-- Auth check: agent must actively ask user for credentials before falling back to output mode
-- Clarified user interaction flow: only fall back if user explicitly refuses
+- Auth check: agent must actively ask user for credentials before falling back
 
 ## 1.5.0 (2026-07-30)
 
 ### Added
 - PDF image extraction via pdfimages (poppler)
-- Step 3 updated for both web article images and PDF embedded images
 
 ## 1.4.0 (2026-07-30)
 

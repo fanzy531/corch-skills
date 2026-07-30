@@ -1,0 +1,3 @@
+display_name: Corch Action
+short_description: Parse structured markdown project documents and publish to WordPress action CPT (实践现场)
+default_prompt: Process the given markdown project document, parse its structure (## headings, images with {.gallery} markers), convert to WordPress action CPT with all ACF fields, and publish.
