@@ -36,38 +36,31 @@
   "recommended": [
     {
       "name": "tavily-search",
-      "source": "Corch 内置",
-      "description": "结构化联网搜索"
+      "source": "Corch 内置"
     },
     {
       "name": "humanizer-zh",
-      "source": "Corch 内置",
-      "description": "中文去AI痕迹（digest/action 自动调用）"
+      "source": "Corch 内置"
     },
     {
       "name": "brainstorming",
-      "source": "Corch 内置",
-      "description": "头脑风暴"
+      "source": "Corch 内置"
     },
     {
       "name": "writing-skills",
-      "source": "Corch 内置",
-      "description": "标准化流程沉淀"
+      "source": "Corch 内置"
     },
     {
       "name": "writing-plans",
-      "source": "Corch 内置",
-      "description": "项目规划"
+      "source": "Corch 内置"
     },
     {
       "name": "content-risk-detector",
-      "source": "Corch 内置",
-      "description": "发布前合规审查"
+      "source": "Corch 内置"
     },
     {
       "name": "verification-before-completion",
-      "source": "Corch 内置",
-      "description": "交付验收"
+      "source": "Corch 内置"
     }
   ],
   "dependencies": {
