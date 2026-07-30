@@ -1,0 +1,3 @@
+display_name: Corch Hub
+short_description: Query C-hub knowledge base for community placemaking
+default_prompt: Answer the user's question by querying the C-hub (C-Hub) knowledge base. Use scripts/c-hub-query.py to send the question to the RAG engine, then present the answer with source references.
