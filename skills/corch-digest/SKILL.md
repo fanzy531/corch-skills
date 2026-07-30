@@ -1,5 +1,6 @@
 ---
 name: corch-digest
+version: 1.0.0
 description: Read articles from a URL, digest and rewrite content, save images to a local folder, output in a structured Tailwind CSS layout, and optionally publish directly to WordPress voice CPT (他山之石). Use when the user provides an article URL and asks for a digest, summary, rewritten version, or wants to publish to the site.
 ---
 
