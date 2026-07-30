@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "description": "Core skills for c-lab content community agents",
+  "version": 2,
+  "description": "Core skills for c-lab content community agents — community building, content publishing, field research",
   "skills": [
     {
       "name": "corch-digest",
@@ -16,6 +16,61 @@
       "name": "corch-hub",
       "path": "skills/corch-hub/SKILL.md",
       "description": "Query C-Hub knowledge base"
+    },
+    {
+      "name": "tavily-search",
+      "path": "",
+      "description": "Structured web search with citations (built into Corch)"
+    },
+    {
+      "name": "humanizer-zh",
+      "path": "",
+      "description": "Remove AI traces from Chinese text"
+    },
+    {
+      "name": "brainstorming",
+      "path": "",
+      "description": "Diverge 10+ angles → converge to 3 plans"
+    },
+    {
+      "name": "writing-skills",
+      "path": "",
+      "description": "Standardize repeatable workflows"
+    },
+    {
+      "name": "writing-plans",
+      "path": "",
+      "description": "Multi-person project planning"
+    },
+    {
+      "name": "content-risk-detector",
+      "path": "",
+      "description": "Pre-publish compliance check"
+    },
+    {
+      "name": "verification-before-completion",
+      "path": "",
+      "description": "Quality check before delivery"
+    },
+    {
+      "name": "markitdown",
+      "path": "",
+      "description": "PDF/DOCX/scan → Markdown text conversion"
+    },
+    {
+      "name": "image-compressor",
+      "path": "skills/image-compressor/SKILL.md",
+      "description": "Batch resize & compress images for web"
+    },
+    {
+      "name": "translate-helper",
+      "path": "skills/translate-helper/SKILL.md",
+      "description": "Translate foreign content to Chinese with consistent terminology"
+    },
+    {
+      "name": "interview-notes",
+      "path": "skills/interview-notes/SKILL.md",
+      "description": "Interview recording → structured notes → publishable content"
     }
   ],
   "dependencies": {
