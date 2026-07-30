@@ -1,18 +1,21 @@
 # Changelog
 
+## 1.5.1 (2026-07-30)
+
+### Fixed
+- Auth check: agent must actively ask user for credentials before falling back to output mode
+- Clarified user interaction flow: only fall back if user explicitly refuses
+
 ## 1.5.0 (2026-07-30)
 
 ### Added
-- PDF image extraction via `pdfimages` (poppler)
-- Step 3 updated: handles both web article images and PDF embedded images
-- Dependencies updated: poppler provides both pdftotext + pdfimages
-- PDF document section in Input types updated with full tool chain
+- PDF image extraction via pdfimages (poppler)
+- Step 3 updated for both web article images and PDF embedded images
 
 ## 1.4.0 (2026-07-30)
 
 ### Added
-- Dependencies section: pdftotext (poppler) + markitdown for PDF extraction
-- PDF extraction decision table, OCR guidance
+- Dependencies section: pdftotext + markitdown for PDF extraction
 
 ## 1.3.0 (2026-07-30)
 

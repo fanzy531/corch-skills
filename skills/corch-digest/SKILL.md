@@ -1,6 +1,6 @@
 ---
 name: corch-digest
-version: 1.5.0
+version: 1.5.1
 description: Read articles from a URL, digest and rewrite content, save images to a local folder, output in a structured Tailwind CSS layout, and optionally publish directly to WordPress voice CPT (他山之石). Use when the user provides an article URL and asks for a digest, summary, rewritten version, or wants to publish to the site.
 ---
 
@@ -109,10 +109,14 @@ After generating all content, optionally publish directly to WordPress.
 **Before starting publish, follow this conversation pattern:**
 
 1. **Check auth**: If `wp_site`/`wp_user`/`wp_password` are not provided:
-   - Tell the user the article content is ready
-   - Ask them to provide: WordPress site URL, username, and Application Password
-   - Guide them: "登录 WP 后台 → 用户 → 个人资料 → Application Passwords → 生成一个"
-   - If they prefer not to set up auth now, fall back to **output mode** (deliver HTML + metadata only)
+   - **必须主动询问用户**，不能直接跳过
+   - 告诉用户文章内容已准备好，需要发布到 WordPress
+   - 要求用户提供：WordPress 站点地址、用户名、应用密码
+   - 引导用户："登录 WP 后台 → 用户 → 个人资料 → Application Passwords → 生成一个"
+   - 提供两种选择：
+     a. 用户提供凭据 → 继续发布流程
+     b. 用户拒绝或暂不提供 → 回退到输出模式（交付 HTML + 元数据）
+   - **只有在用户明确拒绝后才回退到输出模式**，不能自作主张
 
 2. **Select category**: Present the 5 `voice_category` options (see 8.3) and recommend one based on article content. Ask user to confirm.
 
