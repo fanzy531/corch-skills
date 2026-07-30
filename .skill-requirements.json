@@ -25,7 +25,7 @@
     {
       "name": "humanizer-zh",
       "path": "",
-      "description": "去除中文文本的AI痕迹，处理常用套路结构和空洞连接词，让文案读起来像人写的。所有中文内容发布前建议过一遍。"
+      "description": "中文去AI痕迹，corch-digest和corch-action发布前自动调用"
     },
     {
       "name": "brainstorming",
