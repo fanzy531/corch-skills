@@ -1,6 +1,6 @@
 ---
 name: corch-action
-version: 0.2.0
+version: 0.3.0
 description: Parse structured markdown project documents, convert to WordPress action CPT (实践现场) with all ACF fields (repeater, gallery, group), and publish. Use when the user provides a markdown project file and asks to publish it as an action article.
 ---
 
@@ -133,7 +133,34 @@ MD 文档中的图片引用有两种写法，决定图片在文章中的位置�
 
 ### 4. Optimize images
 
-Before uploading, run `scripts/optimize_images.py` on all images:
+Before uploading, run `scripts/optimize_images.py` on the image directory:
+
+```bash
+python3 scripts/optimize_images.py "图片和附件/"
+```
+
+The script outputs a summary like:
+
+```
+  ✓ 03.jpg: 4000x3000 → 1000x750 (landscape)  2100KB → 180KB
+  ✓ 07.jpg: 3000x4000 → 1200x1600 (portrait)  1800KB → 150KB
+  - 49 images skipped (already optimal)
+
+Optimized: 2  |  Skipped (already optimal): 49
+```
+
+**After compression, present the summary to the user and ask:**
+
+> 图片压缩完成：X 张已优化，Y 张跳过。
+> 
+> | 文件 | 原尺寸 | 压缩后 |
+> |---|---|---|
+> | 03.jpg | 4000x3000 | 1000x750, 180KB |
+> | 07.jpg | 3000x4000 | 1200x1600, 150KB |
+> 
+> 继续上传到媒体库？(y/N)
+
+Only proceed to upload on explicit confirmation.
 
 | Image type | Target width |
 |---|---|

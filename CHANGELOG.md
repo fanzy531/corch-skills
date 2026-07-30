@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0 (2026-07-30)
+
+### Added
+- Image compression confirmation step: user reviews before upload
+
 ## 0.2.0 (2026-07-30)
 
 ### Added
