@@ -1,76 +1,73 @@
 {
-  "version": 2,
-  "description": "Core skills for c-lab content community agents — community building, content publishing, field research",
+  "version": 3,
+  "description": "面向 c-lab 内容社区团队的 Codex 技能包",
   "skills": [
     {
       "name": "corch-digest",
       "path": "skills/corch-digest/SKILL.md",
-      "description": "Read, digest, rewrite articles → publish to voice CPT"
+      "description": "转载文献 → voice CPT"
     },
     {
       "name": "corch-action",
       "path": "skills/corch-action/SKILL.md",
-      "description": "Parse MD projects → publish to action CPT"
+      "description": "项目文档 → action CPT"
     },
     {
       "name": "corch-hub",
       "path": "skills/corch-hub/SKILL.md",
-      "description": "Query C-Hub knowledge base"
-    },
-    {
-      "name": "tavily-search",
-      "path": "",
-      "description": "结构化联网搜索，返回带引用来源和摘要的搜索结果。适合写文章查资料、做行业报告、需要引用具体来源的场景。"
-    },
-    {
-      "name": "humanizer-zh",
-      "path": "",
-      "description": "中文去AI痕迹，corch-digest和corch-action发布前自动调用"
-    },
-    {
-      "name": "brainstorming",
-      "path": "",
-      "description": "头脑风暴能力：从一个问题出发，发散出10个以上的角度或想法，再收敛到3个最优方案。适合活动策划、文章选题、项目方案设计的创意阶段。"
-    },
-    {
-      "name": "writing-skills",
-      "path": "",
-      "description": "将团队中重复性的工作沉淀为标准操作流程（SOP）。选题流程、发布检查清单、活动执行手册等规范化时使用。"
-    },
-    {
-      "name": "writing-plans",
-      "path": "",
-      "description": "复杂任务前的分步规划文档，含目标、依赖关系、风险识别、验收标准。适合多人协作、跨周项目启动前使用。"
-    },
-    {
-      "name": "content-risk-detector",
-      "path": "",
-      "description": "发布前合规审查：检查广告法违规词、平台敏感词、健康/金融合规、虚假宣传风险。每次发布前使用，避免罚款和限流。"
-    },
-    {
-      "name": "verification-before-completion",
-      "path": "",
-      "description": "交付前的验收能力，确保任务真正完成而非看起来做完了。检查清单、验收标准、边界情况测试，每次交付成果前使用。"
-    },
-    {
-      "name": "markitdown",
-      "path": "",
-      "description": "PDF/DOCX/scan → Markdown text conversion"
+      "description": "社区营造知识库问答"
     },
     {
       "name": "corch-image-compressor",
       "path": "skills/corch-image-compressor/SKILL.md",
-      "description": "批量压缩和转换图片：横幅缩小至宽度1000px，竖幅缩小至宽度1200px，全部转为JPEG格式。上传到网站前使用，可大幅减少图片体积。"
+      "description": "批量压缩图片"
     },
     {
       "name": "corch-translate-helper",
       "path": "skills/corch-translate-helper/SKILL.md",
-      "description": "将外文内容（日文、英文等）翻译为中文，保持社区营造领域术语的一致性（如社区営造→社区营造）。翻译后输出中文文本，附带译注说明。"
+      "description": "外文→中文翻译"
     },
     {
       "name": "corch-interview-notes",
       "path": "skills/corch-interview-notes/SKILL.md",
-      "description": "将访谈录音或笔记整理为结构化、可发布的内容。按主题组织访谈记录，保留受访者原话，区分事实与观察者解读，适合社区营造田野工作的归档与传播。"
+      "description": "访谈→结构化笔记"
+    }
+  ],
+  "recommended": [
+    {
+      "name": "tavily-search",
+      "source": "Corch 内置",
+      "description": "结构化联网搜索"
+    },
+    {
+      "name": "humanizer-zh",
+      "source": "Corch 内置",
+      "description": "中文去AI痕迹（digest/action 自动调用）"
+    },
+    {
+      "name": "brainstorming",
+      "source": "Corch 内置",
+      "description": "头脑风暴"
+    },
+    {
+      "name": "writing-skills",
+      "source": "Corch 内置",
+      "description": "标准化流程沉淀"
+    },
+    {
+      "name": "writing-plans",
+      "source": "Corch 内置",
+      "description": "项目规划"
+    },
+    {
+      "name": "content-risk-detector",
+      "source": "Corch 内置",
+      "description": "发布前合规审查"
+    },
+    {
+      "name": "verification-before-completion",
+      "source": "Corch 内置",
+      "description": "交付验收"
     }
   ],
   "dependencies": {

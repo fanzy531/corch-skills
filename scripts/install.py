@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 """
-corch-skills installer — cross-platform (macOS / Windows / Linux)
-Reads .skill-requirements.json and installs:
-  - Codex skills (via install-skill-from-github.py)
-  - pip packages (Pillow)
-  - System packages (brew / choco / apt)
+corch-skills 安装器 — 跨平台（macOS / Windows / Linux）
 """
 
 import json, os, subprocess, sys, platform
@@ -12,98 +8,80 @@ from pathlib import Path
 
 REPO = "fanzy531/corch-skills"
 HERE = Path(__file__).parent.resolve()
-REPO_ROOT = HERE.parent
-REQUIREMENTS = REPO_ROOT / ".skill-requirements.json"
+ROOT = HERE.parent
+REQUIREMENTS = ROOT / ".skill-requirements.json"
 INSTALLER = Path.home() / ".codex" / "skills" / ".system" / "skill-installer" / "scripts" / "install-skill-from-github.py"
 
 
-def run(cmd, check=True, capture=False):
-    """Run a command and print output."""
+def run(cmd, check=False):
     print(f"  $ {' '.join(cmd)}")
-    try:
-        if capture:
-            return subprocess.run(cmd, capture_output=True, text=True, check=check)
-        subprocess.run(cmd, check=check)
-    except subprocess.CalledProcessError as e:
-        print(f"    ⚠ failed (exit {e.returncode}), continuing...")
+    subprocess.run(cmd, check=check)
 
 
-def install_skills(req, dest):
-    """Install all skills from manifest to dest directory."""
-    for s in req["skills"]:
+def install_skills(req, dest_dir):
+    """安装所有可安装的 skill"""
+    for s in req.get("skills", []):
         name = s["name"]
         path = s["path"]
-        print(f"\n  → {name} ({path})")
-        # Remove old
-        subprocess.run(["rm", "-rf", str(dest / name)], capture_output=True)
-        # Install
+        print(f"\n  → {name}")
+        subprocess.run(["rm", "-rf", str(dest_dir / name)], capture_output=True)
         if INSTALLER.exists():
-            run(["python3", str(INSTALLER), "--repo", REPO, "--path", path,
-                 "--dest", str(dest), "--name", name])
+            run([sys.executable, str(INSTALLER), "--repo", REPO, "--path", path,
+                 "--dest", str(dest_dir), "--name", name])
         else:
-            print(f"    ⚠ installer not found at {INSTALLER}")
-            print(f"    Install via: codex skill install fanzy531/corch-skills --path {path}")
-
-
-def install_pip(deps):
-    """Install pip packages."""
-    for pkg in deps:
-        print(f"  pip install {pkg}")
-        run([sys.executable, "-m", "pip", "install", pkg], check=False)
-
-
-def install_system(deps):
-    """Install system packages — platform-aware."""
-    system = platform.system()
-    for pkg in deps:
-        print(f"  System: {pkg}")
-        if system == "Darwin":
-            run(["brew", "install", pkg], check=False)
-        elif system == "Windows":
-            # Try chocolatey first, then winget
-            run(["choco", "install", pkg, "-y"], check=False)
-        elif system == "Linux":
-            run(["sudo", "apt-get", "install", "-y", pkg], check=False)
-        else:
-            print(f"    ⚠ unknown platform {system}, please install {pkg} manually")
+            print(f"    安装器未找到: {INSTALLER}")
+            print(f"    手动安装: codex skill install fanzy531/corch-skills --path {path}")
 
 
 def main():
     if not REQUIREMENTS.exists():
-        print(f"✗ {REQUIREMENTS} not found")
+        print(f"✗ {REQUIREMENTS} 未找到")
         sys.exit(1)
 
     req = json.loads(REQUIREMENTS.read_text())
-    print(f"=== corch-skills installer ===")
-    print(f"Platform: {platform.system()} {platform.release()}")
-    print(f"Skills to install: {len(req['skills'])}")
+    system = platform.system()
+    
+    print(f"=== corch-skills 安装器 ===")
+    print(f"系统: {system}")
     print()
 
-    # Install to both agent and codex
+    # 安装 skill
     for dest_name, dest_path in [("agent", Path.home() / ".agents" / "skills"),
                                    ("codex", Path.home() / ".codex" / "skills")]:
-        print(f"--- Installing to {dest_name} ---")
+        print(f"--- 安装到 {dest_name} ---")
         install_skills(req, dest_path)
         print()
 
-    # Pip dependencies
-    pip_deps = req.get("dependencies", {}).get("pip", [])
-    if pip_deps:
-        print("--- Python packages ---")
-        install_pip(pip_deps)
-        print()
+    # pip 依赖
+    for pkg in req.get("dependencies", {}).get("pip", []):
+        print(f"pip install {pkg}")
+        run([sys.executable, "-m", "pip", "install", pkg])
 
-    # System dependencies
-    brew_deps = req.get("dependencies", {}).get("brew", [])
-    if brew_deps:
-        print("--- System packages ---")
-        install_system(brew_deps)
-        print()
+    # 系统依赖
+    sys_deps = req.get("dependencies", {}).get("system", {}).get(system, {})
+    for mgr, pkgs in sys_deps.items():
+        for pkg in pkgs:
+            print(f"系统包: {pkg} ({mgr})")
+            if system == "Darwin":
+                run(["brew", "install", pkg])
+            elif system == "Windows":
+                run([mgr, "install", pkg, "-y"])
+            elif system == "Linux":
+                run(["sudo", "apt-get", "install", "-y", pkg])
 
-    print("=== Done ===")
-    print(f"Installed {len(req['skills'])} skills")
-    print()
-    print("Restart Codex for changes to take effect.")
+    # 推荐 skill（需要手动启用）
+    recommended = req.get("recommended", [])
+    if recommended:
+        print("\n=== 推荐 skill（Corch 内置，无需安装）===")
+        print("以下能力是 Corch 系统内置的，在对话中直接使用即可：")
+        for s in recommended:
+            print(f"  • {s['name']} — {s['description']}")
+
+    print("\n=== 安装完成 ===")
+    print(f"已安装 {len(req['skills'])} 个 skill")
+    if recommended:
+        print(f"{len(recommended)} 个推荐能力可用（Corch 内置）")
+    print("重启 Codex 后生效。")
 
 
 if __name__ == "__main__":
