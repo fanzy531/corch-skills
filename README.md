@@ -1,6 +1,6 @@
 # corch-skills
 
-Corch 技能包。
+面向 c-lab 内容社区团队的 Corch 技能包。开箱即用，覆盖内容生产全流程。
 
 ## 一行安装
 
