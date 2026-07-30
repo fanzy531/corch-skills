@@ -202,6 +202,53 @@ Check the response for `"code": 200`. Open the returned `edit_link` to review in
 
 When `wp_site` is empty, the skill falls back to output-only mode (HTML + metadata). When provided, it completes the full publish-to-WordPress flow.
 
+## Dependencies
+
+The following tools must be available in the execution environment for PDF input support.
+
+### Required: pdftotext (poppler)
+
+Used for extracting text from PDF files. Installed via:
+
+```bash
+brew install poppler         # macOS
+apt-get install poppler-utils # Ubuntu/Debian
+```
+
+Verify: `which pdftotext`
+
+### Alternative: markitdown (Python)
+
+Provides broader document support (DOCX, PPTX, XLSX, OCR). Install via:
+
+```bash
+pip install markitdown
+```
+
+Usage in skill:
+
+```python
+from markitdown import MarkItDown
+md = MarkItDown()
+result = md.convert("/path/to/file.pdf")
+text = result.text_content
+```
+
+### Table: PDF extraction decision
+
+| Condition | Tool | Notes |
+|---|---|---|
+| pdftotext available | `pdftotext input.pdf -` | Best for text PDFs |
+| markitdown available | `MarkItDown.convert()` | Better for mixed content |
+| Neither | Fallback to AI model reading raw PDF | May fail on compressed PDFs |
+
+### OCR (scan-only PDFs)
+
+If the PDF is a scan (no extractable text layer), neither tool will work. Options:
+- Use `markitdown` with OCR dependencies configured
+- Use a dedicated OCR service
+- Inform the user that scanned PDFs cannot be processed
+
 ## Scripts
 
 
