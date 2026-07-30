@@ -19,12 +19,28 @@
     }
   ],
   "dependencies": {
-    "pip": ["Pillow"],
-    "brew": ["poppler"],
-    "skills": ["markitdown"]
-  },
-  "post_install": [
-    "pip3 install Pillow",
-    "brew install poppler 2>/dev/null || echo 'poppler already installed'"
-  ]
+    "pip": [
+      "Pillow"
+    ],
+    "system": {
+      "Darwin": {
+        "brew": [
+          "poppler"
+        ]
+      },
+      "Windows": {
+        "choco": [
+          "poppler"
+        ],
+        "winget": [
+          "poppler"
+        ]
+      },
+      "Linux": {
+        "apt": [
+          "poppler-utils"
+        ]
+      }
+    }
+  }
 }
