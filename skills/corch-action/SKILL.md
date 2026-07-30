@@ -1,6 +1,6 @@
 ---
 name: corch-action
-version: 0.1.0
+version: 0.2.0
 description: Parse structured markdown project documents, convert to WordPress action CPT (实践现场) with all ACF fields (repeater, gallery, group), and publish. Use when the user provides a markdown project file and asks to publish it as an action article.
 ---
 
@@ -46,12 +46,90 @@ Each `## ` heading (excluding the document title and outcomes/appendix) becomes 
 
 ### 3. Parse images
 
-Scan all `![alt](path)` references in the MD:
+#### 3.1 `{.gallery}` 标记规则
 
-- **Without `{.gallery}`** → embed in `section_body` as `<img src="media_url">`
-- **With `{.gallery}`** → add to `section_gallery` array (media IDs)
+MD 文档中的图片引用有两种写法，决定图片在文章中的位置：
 
-Images outside any section heading (e.g. appendix) → inline in the appendix section_body.
+```markdown
+<!-- 嵌入正文：图片在 WYSIWYG body 的文字流中 -->
+![社区活动照片](图片和附件/01.jpg)
+
+<!-- 放入画廊：缩略图网格 + lightbox -->
+![展览现场](图片和附件/07.jpg){.gallery}
+```
+
+| 写法 | 字段 | 输出 |
+|---|---|---|
+| `![alt](path)` | `section_body` | `<img src="media_url" alt="alt">` |
+| `![alt](path){.gallery}` | `section_gallery` | media ID 加入数组 |
+
+`{.gallery}` 必须是图片路径**末尾的后缀**，出现在 `)` 之前。
+
+#### 3.2 归属章节
+
+每张图片根据它在 MD 中出现的上下文，归属到**上一个 `## ` 标题**对应的 `action_sections` 项：
+
+- 图片出现在 `## 一、项目简介` 下方 → 归属 sections[0]
+- 图片出现在 `## 二、项目缘起` 下方 → 归属 sections[1]
+- 以此类推
+
+#### 3.3 处理流程
+
+对文档中的每一张图片：
+
+1. 提取 alt 文本和路径：`![alt](path){.gallery}` → alt="alt", path="path", is_gallery=True
+2. 根据 MD 中的位置确定归属章节
+3. 将本地路径映射为上传后的 WordPress 媒体 URL + ID
+4. 生成输出：
+   - **非 gallery 图片**：在 `section_body` 中插入 `<p><img src="media_url" alt="alt" style="width:100%;max-width:600px;height:auto;margin:12px 0;"></p>`
+   - **gallery 图片**：将 media ID 加入 `section_gallery` 数组
+
+#### 3.4 边缘情况
+
+| 情况 | 处理 |
+|---|---|
+| 图片在两个 `##` 之间（严格位于前一个章节文本之后、下一个 `##` 之前） | 归属到**前一个**章节 |
+| 同一张图片被多次引用 | 只上传一次，复用 media ID 和 URL |
+| `{.gallery}` 写在 alt 内部而非路径末尾 | 不识别，按普通图片处理 |
+| 文档末尾、最后一个 `##` 之后的图片（如附录末尾） | 归属到最后一个章节 |
+| 图片文件不存在 | 跳过并输出警告，不中断流程 |
+
+#### 3.5 示例
+
+原始 MD：
+
+```markdown
+## 一、项目简介
+
+项目从社区的旧衣和裁缝铺出发...
+
+![旧衣收集现场](图片和附件/01.jpg)
+
+## 二、项目缘起
+
+始于一件2001年的手织毛衣...
+
+![大头毛衣](图片和附件/02.jpg)
+
+![展览海报](图片和附件/03.jpg){.gallery}
+```
+
+解析后 sections：
+
+```json
+{
+  "section_number": "01 // PROJECT OVERVIEW",
+  "section_title": "项目简介",
+  "section_body": "<p>项目从社区的旧衣和裁缝铺出发...</p><p><img src="...01.jpg" alt="旧衣收集现场"></p>",
+  "section_gallery": []
+},
+{
+  "section_number": "02 // BACKGROUND",
+  "section_title": "项目缘起",
+  "section_body": "<p>始于一件2001年的手织毛衣...</p><p><img src="...02.jpg" alt="大头毛衣"></p>",
+  "section_gallery": [84]
+}
+```
 
 ### 4. Optimize images
 
