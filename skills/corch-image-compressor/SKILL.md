@@ -1,31 +1,9 @@
 ---
-name: image-compressor
+name: corch-image-compressor
 version: 0.1.0
-description: Batch resize and compress images for web publishing. Landscape → 1000w, Portrait → 1200w, all to JPEG quality 85.
+description: 批量压缩和转换图片：横幅缩小至宽度1000px，竖幅缩小至宽度1200px，全部转为JPEG格式。上传到网站前使用，可大幅减少图片体积。
 ---
 
-# Image Compressor
+# corch-image-compressor
 
-## Usage
-
-```bash
-python3 scripts/compress.py <images_dir>
-```
-
-## Rules
-
-| Image type | Target width |
-|---|---|
-| Landscape (w > h) | 1000px |
-| Portrait (w ≤ h) | 1200px |
-
-- Only resize if current width exceeds target
-- Convert all to JPEG (quality 85, optimize=True)
-- Non-JPG inputs (PNG, WebP, etc.) → JPEG
-- Already-optimal JPGs are skipped
-
-## Dependencies
-
-```bash
-pip install Pillow
-```
+批量压缩和转换图片：横幅缩小至宽度1000px，竖幅缩小至宽度1200px，全部转为JPEG格式。上传到网站前使用，可大幅减少图片体积。

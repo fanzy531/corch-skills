@@ -20,37 +20,37 @@
     {
       "name": "tavily-search",
       "path": "",
-      "description": "Structured web search with citations (built into Corch)"
+      "description": "结构化联网搜索，返回带引用来源和摘要的搜索结果。适合写文章查资料、做行业报告、需要引用具体来源的场景。"
     },
     {
       "name": "humanizer-zh",
       "path": "",
-      "description": "Remove AI traces from Chinese text"
+      "description": "去除中文文本的AI痕迹，处理常用套路结构和空洞连接词，让文案读起来像人写的。所有中文内容发布前建议过一遍。"
     },
     {
       "name": "brainstorming",
       "path": "",
-      "description": "Diverge 10+ angles → converge to 3 plans"
+      "description": "头脑风暴能力：从一个问题出发，发散出10个以上的角度或想法，再收敛到3个最优方案。适合活动策划、文章选题、项目方案设计的创意阶段。"
     },
     {
       "name": "writing-skills",
       "path": "",
-      "description": "Standardize repeatable workflows"
+      "description": "将团队中重复性的工作沉淀为标准操作流程（SOP）。选题流程、发布检查清单、活动执行手册等规范化时使用。"
     },
     {
       "name": "writing-plans",
       "path": "",
-      "description": "Multi-person project planning"
+      "description": "复杂任务前的分步规划文档，含目标、依赖关系、风险识别、验收标准。适合多人协作、跨周项目启动前使用。"
     },
     {
       "name": "content-risk-detector",
       "path": "",
-      "description": "Pre-publish compliance check"
+      "description": "发布前合规审查：检查广告法违规词、平台敏感词、健康/金融合规、虚假宣传风险。每次发布前使用，避免罚款和限流。"
     },
     {
       "name": "verification-before-completion",
       "path": "",
-      "description": "Quality check before delivery"
+      "description": "交付前的验收能力，确保任务真正完成而非看起来做完了。检查清单、验收标准、边界情况测试，每次交付成果前使用。"
     },
     {
       "name": "markitdown",
@@ -60,17 +60,17 @@
     {
       "name": "corch-image-compressor",
       "path": "skills/corch-image-compressor/SKILL.md",
-      "description": "Batch resize & compress images for web"
+      "description": "批量压缩和转换图片：横幅缩小至宽度1000px，竖幅缩小至宽度1200px，全部转为JPEG格式。上传到网站前使用，可大幅减少图片体积。"
     },
     {
       "name": "corch-translate-helper",
       "path": "skills/corch-translate-helper/SKILL.md",
-      "description": "Translate foreign content to Chinese with consistent terminology"
+      "description": "将外文内容（日文、英文等）翻译为中文，保持社区营造领域术语的一致性（如社区営造→社区营造）。翻译后输出中文文本，附带译注说明。"
     },
     {
       "name": "corch-interview-notes",
       "path": "skills/corch-interview-notes/SKILL.md",
-      "description": "Interview recording → structured notes → publishable content"
+      "description": "将访谈录音或笔记整理为结构化、可发布的内容。按主题组织访谈记录，保留受访者原话，区分事实与观察者解读，适合社区营造田野工作的归档与传播。"
     }
   ],
   "dependencies": {
