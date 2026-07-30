@@ -1,10 +1,35 @@
 ---
 name: corch-digest
-version: 1.2.0
+version: 1.3.0
 description: Read articles from a URL, digest and rewrite content, save images to a local folder, output in a structured Tailwind CSS layout, and optionally publish directly to WordPress voice CPT (他山之石). Use when the user provides an article URL and asks for a digest, summary, rewritten version, or wants to publish to the site.
 ---
 
 # Corch Digest
+
+## 0. Input types
+
+### Web article (default)
+- Input: URL to a web page
+- Process: Fetch HTML, extract article body, images, metadata
+- Output: Standard corch-digest flow
+
+### PDF document
+- Input: Local file path or URL to a `.pdf` file
+- Process:
+  1. If URL, download the PDF first
+  2. Use `markitdown` skill to convert PDF → Markdown text
+  3. The extracted text becomes the article body
+  4. Extract metadata from the document (title, author, date if available)
+  5. Download any embedded/attached images if possible
+- Limitation: PDF layout/formatting fidelity depends on markitdown
+
+### Foreign language
+- If the source text (web or PDF) is not in Chinese:
+  1. Extract text as usual (via HTML fetch or markitdown)
+  2. During **Step 4 (Digest & rewrite)**, translate the content to Chinese
+  3. Keep the original publication name and author in metadata
+  4. Note the original language in `voice_curator_note`
+- The translation is done by the AI model itself during the rewrite step
 
 ## Workflow
 

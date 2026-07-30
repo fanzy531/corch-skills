@@ -1,13 +1,17 @@
 # Changelog
 
+## 1.3.0 (2026-07-30)
+
+### Added
+- Input types section: support for PDF documents (via markitdown) and foreign language content (AI translation during digest)
+
+---
+
 ## 1.2.0 (2026-07-30)
 
 ### Added
 - User interaction flow: guide to get Application Password, category selection, confirmation before publish
 - Output mode fallback when auth not provided
-
-### Changed
-- Publish step now requires user confirmation before POST
 
 ---
 
