@@ -98,7 +98,21 @@ Collect the returned media IDs. Build a mapping of `local_path -> media_id` and 
 
 Replace all `<img src="images/...">` with the WordPress media URLs from step 8.1.
 
-### 8.3 Build publish payload
+### 8.3 Select voice category
+
+**`voice_category` 是必填字段。** 从以下选项中选择最贴近文章内容的分类：
+
+| slug | 名称 | 适用内容 |
+|---|---|---|
+| `community-building` | 社区营造 | 社区营造综合案例、理论、政策 |
+| `autonomy` | 地方自治 | 社区自治、居民自组织、地方治理 |
+| `social-innovation` | 社会创新 | 社会企业、创新模式、跨界协作 |
+| `methodology` | 设计方法论 | 参与式设计、行动研究、工具方法 |
+| `informal` | 非正式空间 | 街头空间、临时用途、边缘社区 |
+
+将所选 slug 填入 payload 的 `voice_category` 字段。
+
+### 8.4 Build publish payload
 
 ```json
 {
@@ -108,7 +122,7 @@ Replace all `<img src="images/...">` with the WordPress media URLs from step 8.1
   "status": "publish",
   "featured_media": 123,
   "acf": {
-    "voice_category": "term_slug_from_taxonomy",
+    "voice_category": "community-building",
     "voice_subtitle": "Curator subtitle or lead-in",
     "voice_keywords": [{"keyword": "标签1"}, {"keyword": "标签2"}],
     "voice_publication": "Source publication name",
