@@ -58,18 +58,18 @@
       "description": "PDF/DOCX/scan → Markdown text conversion"
     },
     {
-      "name": "image-compressor",
-      "path": "skills/image-compressor/SKILL.md",
+      "name": "corch-image-compressor",
+      "path": "skills/corch-image-compressor/SKILL.md",
       "description": "Batch resize & compress images for web"
     },
     {
-      "name": "translate-helper",
-      "path": "skills/translate-helper/SKILL.md",
+      "name": "corch-translate-helper",
+      "path": "skills/corch-translate-helper/SKILL.md",
       "description": "Translate foreign content to Chinese with consistent terminology"
     },
     {
-      "name": "interview-notes",
-      "path": "skills/interview-notes/SKILL.md",
+      "name": "corch-interview-notes",
+      "path": "skills/corch-interview-notes/SKILL.md",
       "description": "Interview recording → structured notes → publishable content"
     }
   ],
