@@ -57,23 +57,9 @@ Structure in order:
 7. Source line — publication + original URL
 8. `[ TRANSCRIPTION ENDS ]` marker
 
-### 6. Output plain text pieces
+### 6. Deliver
 
-Generate two separate plain text outputs (no HTML):
-
-**导读 (Curator's Reflection)** — prefixed with `【corch 导读 / Curator's Reflection】`
-
-**元数据 Spec** — structured with the fields from Step 2, following the format in `references/output-format.md` (§3).
-
-### 7. Deliver
-
-Present all three outputs:
-
-| # | What | Format | Where it goes |
-|---|---|---|---|
-| 1 | Body HTML fragment | HTML (inline styles) | WordPress post_content or any CMS |
-| 2 | 导读 | Plain text | WordPress excerpt / 摘要 or lead-in |
-| 3 | 元数据 Spec | Plain text | WordPress tags, categories, custom fields |
+Output the body HTML fragment. If `wp_site` is not set, also output the metadata (导读、关键词、出处等) as structured text for manual entry.
 
 ## 8. Publish to WordPress (voice CPT)
 
