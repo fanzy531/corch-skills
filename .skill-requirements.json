@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "description": "Core skills for c-lab content community agents",
+  "skills": [
+    {
+      "name": "corch-digest",
+      "path": "skills/corch-digest/SKILL.md",
+      "description": "Read, digest, rewrite articles → publish to voice CPT"
+    },
+    {
+      "name": "corch-action",
+      "path": "skills/corch-action/SKILL.md",
+      "description": "Parse MD projects → publish to action CPT"
+    },
+    {
+      "name": "corch-hub",
+      "path": "skills/corch-hub/SKILL.md",
+      "description": "Query C-Hub knowledge base"
+    }
+  ],
+  "dependencies": {
+    "pip": ["Pillow"],
+    "brew": ["poppler"],
+    "skills": ["markitdown"]
+  },
+  "post_install": [
+    "pip3 install Pillow",
+    "brew install poppler 2>/dev/null || echo 'poppler already installed'"
+  ]
+}
