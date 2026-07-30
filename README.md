@@ -1,6 +1,6 @@
 # corch-skills
 
-面向 c-lab 内容社区团队的 Codex 技能包。
+Corch 技能包。
 
 ## 一行安装
 
