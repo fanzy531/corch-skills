@@ -1,6 +1,6 @@
 ---
 name: corch-digest
-version: 1.4.0
+version: 1.5.0
 description: Read articles from a URL, digest and rewrite content, save images to a local folder, output in a structured Tailwind CSS layout, and optionally publish directly to WordPress voice CPT (他山之石). Use when the user provides an article URL and asks for a digest, summary, rewritten version, or wants to publish to the site.
 ---
 
@@ -17,11 +17,13 @@ description: Read articles from a URL, digest and rewrite content, save images t
 - Input: Local file path or URL to a `.pdf` file
 - Process:
   1. If URL, download the PDF first
-  2. Use `markitdown` skill to convert PDF → Markdown text
-  3. The extracted text becomes the article body
-  4. Extract metadata from the document (title, author, date if available)
-  5. Download any embedded/attached images if possible
-- Limitation: PDF layout/formatting fidelity depends on markitdown
+  2. Extract text: `pdftotext input.pdf output.txt` (poppler)
+  3. Extract images: `pdfimages -all input.pdf images/prefix` (separates embedded JPGs)
+  4. The extracted text becomes the article body
+  5. Extract metadata from the document (title, author, date, keywords)
+  6. Images are available for later upload to WordPress media library
+- Tools: poppler (`pdftotext` + `pdfimages`), must be pre-installed
+- Limitation: Scanned PDFs require OCR; some PDFs may have structural issues (XRef errors)
 
 ### Foreign language
 - If the source text (web or PDF) is not in Chinese:
@@ -55,9 +57,21 @@ From the original article, identify:
 | `reprint_date` | Current date (YYYY.MM.DD) |
 | `copyright` | Standard copyright notice |
 
-### 3. Download images
+### 3. Download / extract images
 
-Pass all image URLs to `scripts/download_images.py <urls_json> <images_dir>`. Use the returned URL-to-local-path mapping to update `<img>` src attributes to relative local paths.
+**For web articles:** Pass all image URLs to `scripts/download_images.py <urls_json> <images_dir>`. Use the returned URL-to-local-path mapping to update `<img>` src attributes to relative local paths.
+
+**For PDF documents:** Use `pdfimages` (included with poppler) to extract embedded images:
+
+```bash
+mkdir -p images/
+pdfimages -all input.pdf images/img
+# → images/img-000.jpg, img-001.jpg, ...
+```
+
+Extracted images are typically JPEG at reasonable resolutions. Collect the file paths for later upload to WordPress media library. Note: PDF images do not have captions; use context from surrounding text.
+
+If both methods apply (e.g. HTML article with embedded PDF figures), use both.
 
 ### 4. Digest & rewrite
 
@@ -206,9 +220,14 @@ When `wp_site` is empty, the skill falls back to output-only mode (HTML + metada
 
 The following tools must be available in the execution environment for PDF input support.
 
-### Required: pdftotext (poppler)
+### Required: poppler (pdftotext + pdfimages)
 
-Used for extracting text from PDF files. Installed via:
+Used for extracting text and embedded images from PDF files.
+
+| Command | Purpose |
+|---|---|
+| `pdftotext input.pdf -` | Extract text content |
+| `pdfimages -all input.pdf prefix` | Extract all embedded images as JPEG | Installed via:
 
 ```bash
 brew install poppler         # macOS
