@@ -29,7 +29,7 @@ The `section_body` field is WYSIWYG (HTML). Content rules:
 
 ## Date Format
 
-**CRITICAL:** `action_period` sub-fields are ACF `date_picker` type. Must use `Ymd` format **with day** (8 digits):
+**CRITICAL:** `action_period` sub-fields are ACF `date_picker` type. Must use `Ymd` format **with day** (8 digits). When the MD only provides year+month, default the day to `01`:
 
 ```json
 "action_period": {
@@ -38,7 +38,7 @@ The `section_body` field is WYSIWYG (HTML). Content rules:
 }
 ```
 
-Using `2024.11` (Y.m), `202411` (6-digit Ymd), or any format `strtotime()` cannot parse will result in `1970.01` (epoch fallback). Always use `20241101` (YYYYMMDD).
+When MD says `2024年11月—2025年5月`, write `20241101` and `20250501`. Using `2024.11`, `202411`, or any format `strtotime()` cannot parse results in `1970.01`.
 
 ## Color Values
 

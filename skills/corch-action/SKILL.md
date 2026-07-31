@@ -24,7 +24,7 @@ Extract from the MD document:
 | `action_subtitle` | First paragraph or subtitle line |
 | `action_category` | `fieldwork` or `inspirations` (ask user if unclear) |
 | `action_location` | Text after "项目地点" or similar |
-| `action_period` | Date range in "项目时间" section |
+| `action_period` | Date range in "项目时间" section → **YYYYMM01**（日默认1号） |
 | `action_initiator` | "发起人" section |
 | `action_type` | Keywords from the opening metadata block |
 | `action_tags` | Tags/keywords listed in the document |
@@ -211,7 +211,7 @@ Collect returned media IDs for gallery and inline references.
 }
 ```
 
-> **注意：** `date_picker` 字段 `period_start`/`period_end` 必须用 `Ymd` 格式（如 `20241101`，8位含日），不可用 `2024.11` 或 6 位 `202411`
+> **注意：** `date_picker` 字段 `period_start`/`period_end` 必须用 `Ymd` 格式（如 `20241101`；MD 只有年月时，日默认 01），不可用 `2024.11`、`202411` 或任何 strtotime 无法解析的格式
 
 ### 7. User confirm
 
