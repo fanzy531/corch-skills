@@ -1,5 +1,10 @@
 # 更新日志
 
+## 2.3.0 (2026-07-31)
+
+### 变更
+- `content-risk-detector` 从 Corch 内置推荐升级为外部源安装（liuxingqitd/content-risk-detector）
+
 ## 2.2.0 (2026-07-31)
 
 ### 变更

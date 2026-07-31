@@ -42,7 +42,13 @@
       "name": "agent-reach",
       "source": "Panniantong/Agent-Reach",
       "path": "agent_reach/skill",
-      "description": "全网搜索：小红书/推特/B站/Reddit/YouTube/GitHub"
+      "description": "全网搜索"
+    },
+    {
+      "name": "content-risk-detector",
+      "source": "liuxingqitd/content-risk-detector",
+      "path": "SKILL.md",
+      "description": "发布前合规审查"
     },
     {
       "name": "brainstorming",
@@ -69,12 +75,7 @@
       "description": "标准化流程沉淀"
     }
   ],
-  "recommended": [
-    {
-      "name": "content-risk-detector",
-      "source": "Corch 内置"
-    }
-  ],
+  "recommended": [],
   "dependencies": {
     "pip": [
       "Pillow"
