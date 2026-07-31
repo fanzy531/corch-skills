@@ -4,6 +4,7 @@
 
 ### 新增
 - 时间线组件规范（Tailwind + c-lab 风格）：日期节点、陶土色圆点、竖线布局
+- 时间线节点支持 0-N 张图片，图片用 figure 包裹保证结构健壮
 - single-action.php 富文本直出：section_body 含块级 HTML 时不再剥离 div
 
 ## 2.5.0 (2026-07-31)
