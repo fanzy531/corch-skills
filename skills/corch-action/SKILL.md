@@ -197,8 +197,8 @@ Collect returned media IDs for gallery and inline references.
     "action_category": "fieldwork",
     "action_location": "成都社区",
     "action_period": {
-      "period_start": "202411",
-      "period_end": "202505"
+      "period_start": "20241101",
+      "period_end": "20250501"
     },
     "action_initiator": "发起人",
     "action_type": "项目类型",
@@ -211,7 +211,7 @@ Collect returned media IDs for gallery and inline references.
 }
 ```
 
-> **注意：** `date_picker` 字段 `period_start`/`period_end` 必须用 `Ymd` 格式（如 `202411`），不可用 `2024.11`
+> **注意：** `date_picker` 字段 `period_start`/`period_end` 必须用 `Ymd` 格式（如 `20241101`，8位含日），不可用 `2024.11` 或 6 位 `202411`
 
 ### 7. User confirm
 

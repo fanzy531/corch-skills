@@ -29,16 +29,16 @@ The `section_body` field is WYSIWYG (HTML). Content rules:
 
 ## Date Format
 
-**CRITICAL:** `action_period` sub-fields are ACF `date_picker` type. Must use `Ymd` format:
+**CRITICAL:** `action_period` sub-fields are ACF `date_picker` type. Must use `Ymd` format **with day** (8 digits):
 
 ```json
 "action_period": {
-  "period_start": "202411",
-  "period_end": "202505"
+  "period_start": "20241101",
+  "period_end": "20250501"
 }
 ```
 
-Using `2024.11` or `Y.m` display format will result in `1970.01` (epoch fallback).
+Using `2024.11` (Y.m), `202411` (6-digit Ymd), or any format `strtotime()` cannot parse will result in `1970.01` (epoch fallback). Always use `20241101` (YYYYMMDD).
 
 ## Color Values
 
