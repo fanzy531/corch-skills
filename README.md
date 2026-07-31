@@ -23,13 +23,15 @@ curl -sL https://raw.githubusercontent.com/fanzy531/corch-skills/main/scripts/in
 | **corch-translate-helper** | 外文→中文翻译，保持术语一致 | — |
 | **corch-interview-notes** | 访谈录音/笔记→结构化可发布内容 | — |
 
-### 外部源（7 个，自动安装）
+### 外部源（9 个，自动安装）
 
 | 技能 | 来源 | 作用 |
 |---|---|---|
 | **agent-reach** | Panniantong/Agent-Reach | 全网搜索：小红书/推特/B站/Reddit/YouTube/GitHub |
 | **humanizer-zh** | op7418/Humanizer-zh | 去除中文文本AI痕迹 |
 | **content-risk-detector** | liuxingqitd/content-risk-detector | 发布前合规审查（短视频/小红书/视频号） |
+| **guizang-social-card-skill** | op7418/guizang-social-card-skill | 小红书图文+公众号封面（28布局） |
+| **html-ppt** | lewislulu/html-ppt-skill | HTML PPT 演示（24主题31布局） |
 | **brainstorming** | obra/superpowers | 头脑风暴发散收敛 |
 | **verification-before-completion** | obra/superpowers | 交付前验收 |
 | **writing-plans** | obra/superpowers | 项目规划文档 |

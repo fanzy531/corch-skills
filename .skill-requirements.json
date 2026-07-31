@@ -51,6 +51,18 @@
       "description": "发布前合规审查"
     },
     {
+      "name": "guizang-social-card-skill",
+      "source": "op7418/guizang-social-card-skill",
+      "path": "SKILL.md",
+      "description": "小红书图文+公众号封面生成（28布局）"
+    },
+    {
+      "name": "html-ppt",
+      "source": "lewislulu/html-ppt-skill",
+      "path": "SKILL.md",
+      "description": "HTML PPT 演示制作（24主题31布局）"
+    },
+    {
       "name": "brainstorming",
       "source": "obra/superpowers",
       "path": "skills/brainstorming",
