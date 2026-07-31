@@ -12,7 +12,7 @@ curl -sL https://raw.githubusercontent.com/fanzy531/corch-skills/main/scripts/in
 
 ## 技能清单
 
-### 可安装（6 个，安装器自动下载）
+### 自建（6 个）
 
 | 技能 | 作用 | 输出 |
 |---|---|---|
@@ -23,28 +23,30 @@ curl -sL https://raw.githubusercontent.com/fanzy531/corch-skills/main/scripts/in
 | **corch-translate-helper** | 外文→中文翻译，保持术语一致 | — |
 | **corch-interview-notes** | 访谈录音/笔记→结构化可发布内容 | — |
 
-### 推荐（7 个，Corch 内置，无需安装）
+### 外部源（5 个，自动安装）
 
-以下能力是 Corch 系统自带的，在对话中直接使用即可：
-
-| 能力 | 作用 | 备注 |
+| 技能 | 来源 | 作用 |
 |---|---|---|
-| **tavily-search** | 结构化联网搜索，带引用来源 | |
-| **humanizer-zh** | 中文去AI痕迹 | digest/action 发布前自动调用 |
-| **brainstorming** | 发散→收敛，活动/选题创意 | |
-| **writing-skills** | 重复工作沉淀为 SOP | |
-| **writing-plans** | 多人协作项目规划 | |
-| **content-risk-detector** | 发布前合规审查 | |
-| **verification-before-completion** | 交付前验收 | |
+| **humanizer-zh** | op7418/Humanizer-zh | 去除中文文本AI痕迹 |
+| **brainstorming** | obra/superpowers | 头脑风暴发散收敛 |
+| **verification-before-completion** | obra/superpowers | 交付前验收 |
+| **writing-plans** | obra/superpowers | 项目规划文档 |
+| **writing-skills** | obra/superpowers | 标准化流程沉淀 |
 
-## 系统依赖
+### Corch 内置（2 个，推荐）
 
-安装器会自动处理：
+| 能力 | 作用 |
+|---|---|
+| **tavily-search** | 结构化联网搜索 |
+| **content-risk-detector** | 发布前合规审查 |
 
-| 依赖 | 安装方式 | macOS | Windows | Linux | 用途 |
-|---|---|---|---|---|---|
-| Pillow | pip | ✓ | ✓ | ✓ | 图片压缩 |
-| poppler | 系统包管理器 | brew | choco | apt | PDF提取 |
+### 工具依赖
+
+| 工具 | 用途 |
+|---|---|
+| **OptMem** | AI agent 永久记忆（自动安装到 ~/.optmem 并集成 agent.md） |
+| **Pillow** | 图片压缩 |
+| **poppler** | PDF 文字和图片提取 |
 
 ## 项目结构
 

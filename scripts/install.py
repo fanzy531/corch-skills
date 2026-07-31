@@ -24,19 +24,30 @@ def run(cmd, check=False):
     subprocess.run(cmd, check=check)
 
 
+def install_skill(name, source, path, dest_dir):
+    """安装单个 skill，支持本地仓库和外部仓库源"""
+    print(f"\n  → {name} (from {source})")
+    subprocess.run(["rm", "-rf", str(dest_dir / name)], capture_output=True)
+
+    if INSTALLER.exists():
+        if source == REPO:
+            run([sys.executable, str(INSTALLER), "--repo", REPO, "--path", path,
+                 "--dest", str(dest_dir), "--name", name])
+        else:
+            run([sys.executable, str(INSTALLER), "--repo", source, "--path", path,
+                 "--dest", str(dest_dir), "--name", name])
+    else:
+        print(f"    安装器未找到: {INSTALLER}")
+        print(f"    手动安装: codex skill install {source} --path {path} --name {name}")
+
+
 def install_skills(req, dest_dir):
     """安装所有可安装的 skill"""
     for s in req.get("skills", []):
         name = s["name"]
         path = s["path"]
-        print(f"\n  → {name}")
-        subprocess.run(["rm", "-rf", str(dest_dir / name)], capture_output=True)
-        if INSTALLER.exists():
-            run([sys.executable, str(INSTALLER), "--repo", REPO, "--path", path,
-                 "--dest", str(dest_dir), "--name", name])
-        else:
-            print(f"    安装器未找到: {INSTALLER}")
-            print(f"    手动安装: codex skill install fanzy531/corch-skills --path {path}")
+        source = s.get("source", REPO)
+        install_skill(name, source, path, dest_dir)
 
 
 def install_tools(req):
@@ -50,37 +61,31 @@ def install_tools(req):
         cmd = info.get("install", "")
         if not cmd:
             continue
-        # 支持以 curl|sh 形式安装
         if "curl" in cmd and "|" in cmd:
             print(f"  $ {cmd}")
             subprocess.run(cmd, shell=True, check=False)
         else:
             run(cmd.split())
 
-        # 检查是否生成 AGENTS.md 提示词，追加到 agent.md
         if name == "optmem":
             inject_optmem_prompt()
 
 
 def inject_optmem_prompt():
     """把 OptMem 的 ## Memory 提示词写入 agent.md（如果存在）"""
-    optmem_dir = Path.home() / ".optmem"
-    memo = optmem_dir / "memo"
+    memo = Path.home() / ".optmem" / "memo"
     if not memo.exists():
         print("    OptMem 未安装成功，跳过 agent.md 集成")
         return
 
-    # 运行 memo init 获取提示词（若已初始化则输出现有配置）
     try:
         result = subprocess.run([str(memo), "init"], capture_output=True, text=True, timeout=10)
         prompt_block = result.stdout
         if not prompt_block:
-            # 已经 init 过，从脚本里读取标准提示词
             prompt_block = get_fallback_prompt()
     except Exception:
         prompt_block = get_fallback_prompt()
 
-    # 找到 agent.md 位置
     agent_md = None
     for cand in AGENT_MD_CANDIDATES:
         if cand.exists():
@@ -88,7 +93,6 @@ def inject_optmem_prompt():
             break
 
     if not agent_md:
-        # 默认创建 ~/.agents/agent.md
         agent_md = AGENT_MD_CANDIDATES[0]
         agent_md.parent.mkdir(parents=True, exist_ok=True)
         agent_md.touch()
@@ -98,9 +102,9 @@ def inject_optmem_prompt():
         print(f"    agent.md 已有 ## Memory 块，跳过")
         return
 
-    marker = "# AGENTS.md — 全局指令\n\n"
     new_block = prompt_block.strip() + "\n"
-    if content.startswith(marker):
+    if content.startswith("# AGENTS.md"):
+        marker = "# AGENTS.md — 全局指令\n\n"
         content = marker + new_block + "\n" + content[len(marker):]
     else:
         content = new_block + "\n" + content
@@ -167,19 +171,16 @@ def main():
     print(f"系统: {system}")
     print()
 
-    # 安装 skill
     for dest_name, dest_path in [("agent", Path.home() / ".agents" / "skills"),
                                    ("codex", Path.home() / ".codex" / "skills")]:
         print(f"--- 安装到 {dest_name} ---")
         install_skills(req, dest_path)
         print()
 
-    # pip 依赖
     for pkg in req.get("dependencies", {}).get("pip", []):
         print(f"pip install {pkg}")
         run([sys.executable, "-m", "pip", "install", pkg])
 
-    # 系统依赖
     sys_deps = req.get("dependencies", {}).get("system", {}).get(system, {})
     for mgr, pkgs in sys_deps.items():
         for pkg in pkgs:
@@ -191,15 +192,12 @@ def main():
             elif system == "Linux":
                 run(["sudo", "apt-get", "install", "-y", pkg])
 
-    # 工具依赖（OptMem）
     print("--- 工具依赖 ---")
     install_tools(req)
 
-    # 推荐 skill（Corch 内置）
     recommended = req.get("recommended", [])
     if recommended:
         print("\n=== 推荐 skill（Corch 内置，无需安装）===")
-        print("以下能力是 Corch 系统内置的，在对话中直接使用即可：")
         for s in recommended:
             print(f"  • {s['name']}")
 
