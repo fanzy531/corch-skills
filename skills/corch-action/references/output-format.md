@@ -51,3 +51,44 @@ All inline styles use the same palette as corch-digest:
 | clay | `#C85A3C` |
 | sage | `#849682` |
 | warmWhite | `#FAF8F3` |
+
+
+## Timeline Component（时间线组件）
+
+当 MD 章节为时间线类内容（标题含"时间线"、内容由"日期｜事件"组成），使用以下 Tailwind 结构：
+
+### HTML 模板
+
+```html
+<div class="timeline relative pl-8 border-l border-ink/10 space-y-12">
+  <div class="relative">
+    <span class="absolute -left-[37px] top-1.5 w-3 h-3 rounded-full bg-clay ring-4 ring-warmWhite"></span>
+    <span class="font-mono text-xs uppercase tracking-widest text-clay font-bold">2024年11月</span>
+    <h4 class="font-serif text-xl font-bold text-ink mt-2">社区裁缝铺调研启动</h4>
+    <p class="text-sm md:text-base text-ink/75 leading-relaxed mt-2">从成都玉林片区出发，寻找仍在经营的社区裁缝铺……</p>
+  </div>
+  <!-- 每个时间节点重复此结构 -->
+</div>
+```
+
+### 样式规则
+
+| 元素 | Tailwind 类 | 说明 |
+|---|---|---|
+| 容器 | `timeline relative pl-8 border-l border-ink/10 space-y-12` | 左侧竖线 + 缩进 |
+| 节点圆点 | `absolute -left-[37px] top-1.5 w-3 h-3 rounded-full bg-clay ring-4 ring-warmWhite` | 陶土色实心点 |
+| 日期 | `font-mono text-xs uppercase tracking-widest text-clay font-bold` | 等宽小字、陶土色 |
+| 小标题 | `font-serif text-xl font-bold text-ink mt-2` | 衬线加粗 |
+| 描述 | `text-sm md:text-base text-ink/75 leading-relaxed mt-2` | 正文灰墨色 |
+
+### 识别规则
+
+- MD 标题：`## 四、项目时间线` 或类似含"时间线"的标题
+- 内容模式：`### 2024年11月｜事件标题` + 描述段落
+- 每个 `###` 子标题对应一个时间节点
+- 日期格式：保持 MD 原文（如 `2024年11月`），不转换成 action_period
+
+### 时间线 vs 普通段落
+
+- 章节标题含"时间线" → 用时间线组件
+- 其他章节 → 普通段落结构（p / h3 / img）
