@@ -1,5 +1,10 @@
 # 更新日志
 
+## 2.2.0 (2026-07-31)
+
+### 变更
+- `tavily-search` 替换为 `agent-reach`（Panniantong/Agent-Reach，全网搜索）
+
 ## 2.1.0 (2026-07-31)
 
 ### 新增

@@ -39,6 +39,12 @@
       "description": "去除中文文本AI痕迹"
     },
     {
+      "name": "agent-reach",
+      "source": "Panniantong/Agent-Reach",
+      "path": "agent_reach/skill",
+      "description": "全网搜索：小红书/推特/B站/Reddit/YouTube/GitHub"
+    },
+    {
       "name": "brainstorming",
       "source": "obra/superpowers",
       "path": "skills/brainstorming",
@@ -64,10 +70,6 @@
     }
   ],
   "recommended": [
-    {
-      "name": "tavily-search",
-      "source": "Corch 内置"
-    },
     {
       "name": "content-risk-detector",
       "source": "Corch 内置"
