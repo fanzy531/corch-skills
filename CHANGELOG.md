@@ -7,6 +7,10 @@
 - 时间线节点支持 0-N 张图片，图片用 figure 包裹保证结构健壮
 - single-action.php 富文本直出：section_body 含块级 HTML 时不再剥离 div
 
+### 修复
+- publish-action/publish-voice 的 repeater 改用 update_field 整体覆盖，避免 delete/add 造成重复行
+- action_period 明确 8 位 Ymd（20241101），MD 年月日默认 01
+
 ## 2.5.0 (2026-07-31)
 
 ### 修复
