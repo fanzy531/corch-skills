@@ -86,6 +86,13 @@
           "poppler-utils"
         ]
       }
+    },
+    "tools": {
+      "optmem": {
+        "description": "Permanent memory for AI agents",
+        "install": "curl -fsSL https://raw.githubusercontent.com/VictorTaelin/OptMem/main/install.sh | sh",
+        "path": "~/.optmem/memo"
+      }
     }
   }
 }

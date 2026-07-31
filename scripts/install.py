@@ -12,6 +12,12 @@ ROOT = HERE.parent
 REQUIREMENTS = ROOT / ".skill-requirements.json"
 INSTALLER = Path.home() / ".codex" / "skills" / ".system" / "skill-installer" / "scripts" / "install-skill-from-github.py"
 
+AGENT_MD_CANDIDATES = [
+    Path.home() / ".agents" / "agent.md",
+    Path.home() / ".agents" / "AGENTS.md",
+    Path.home() / ".agents" / "CLAUDE.md",
+]
+
 
 def run(cmd, check=False):
     print(f"  $ {' '.join(cmd)}")
@@ -33,6 +39,122 @@ def install_skills(req, dest_dir):
             print(f"    手动安装: codex skill install fanzy531/corch-skills --path {path}")
 
 
+def install_tools(req):
+    """安装 OptMem 等工具依赖"""
+    tools = req.get("dependencies", {}).get("tools", {})
+    if not tools:
+        return
+
+    for name, info in tools.items():
+        print(f"\n  → 安装 {name}: {info.get('description', '')}")
+        cmd = info.get("install", "")
+        if not cmd:
+            continue
+        # 支持以 curl|sh 形式安装
+        if "curl" in cmd and "|" in cmd:
+            print(f"  $ {cmd}")
+            subprocess.run(cmd, shell=True, check=False)
+        else:
+            run(cmd.split())
+
+        # 检查是否生成 AGENTS.md 提示词，追加到 agent.md
+        if name == "optmem":
+            inject_optmem_prompt()
+
+
+def inject_optmem_prompt():
+    """把 OptMem 的 ## Memory 提示词写入 agent.md（如果存在）"""
+    optmem_dir = Path.home() / ".optmem"
+    memo = optmem_dir / "memo"
+    if not memo.exists():
+        print("    OptMem 未安装成功，跳过 agent.md 集成")
+        return
+
+    # 运行 memo init 获取提示词（若已初始化则输出现有配置）
+    try:
+        result = subprocess.run([str(memo), "init"], capture_output=True, text=True, timeout=10)
+        prompt_block = result.stdout
+        if not prompt_block:
+            # 已经 init 过，从脚本里读取标准提示词
+            prompt_block = get_fallback_prompt()
+    except Exception:
+        prompt_block = get_fallback_prompt()
+
+    # 找到 agent.md 位置
+    agent_md = None
+    for cand in AGENT_MD_CANDIDATES:
+        if cand.exists():
+            agent_md = cand
+            break
+
+    if not agent_md:
+        # 默认创建 ~/.agents/agent.md
+        agent_md = AGENT_MD_CANDIDATES[0]
+        agent_md.parent.mkdir(parents=True, exist_ok=True)
+        agent_md.touch()
+
+    content = agent_md.read_text()
+    if "## Memory" in content:
+        print(f"    agent.md 已有 ## Memory 块，跳过")
+        return
+
+    marker = "# AGENTS.md — 全局指令\n\n"
+    new_block = prompt_block.strip() + "\n"
+    if content.startswith(marker):
+        content = marker + new_block + "\n" + content[len(marker):]
+    else:
+        content = new_block + "\n" + content
+
+    agent_md.write_text(content)
+    print(f"    ✓ 已写入 ## Memory 到 {agent_md}")
+
+
+def get_fallback_prompt():
+    return """## Memory
+
+Your memory is OptMem:
+- The tool is `~/.optmem/memo`
+- Your memories are in `~/.optmem/memory`
+
+OptMem outlives every session, compaction, model and vendor change.
+Without it you do not know who you are, or what was decided and tried.
+
+### At startup: activating OptMem (mandatory)
+
+Run `~/.optmem/memo wake` before any other tool call, in every session,
+and then do exactly what it prints, to the end of its output.
+
+### While working: register memories (mandatory)
+
+Call `~/.optmem/memo note "<1 line, max 280 bytes>"` whenever you learn
+something new, or something worth keeping happens. That covers a task
+worth real effort, a fact or insight the user teaches you, anything you
+learn about their life (even indirectly), any event of lasting effect.
+
+Do not register redundant memories.
+
+If `~/.optmem/memo note` asks a compression: do it before your next action.
+
+Never edit or delete anything under `~/.optmem/memory`: the tool manages it.
+
+### When you need an old memory: search, or navigate
+
+`~/.optmem/memo recall <regex>` searches every memory, word for word.
+
+Your memories also form a binary tree: #0-1, #2-3 ... exist as one-line
+summaries, pairs of those as #0-3, and so on -- every `#a-b` line wake
+prints is one node of it. `~/.optmem/memo zoom <a-b>` opens a node into its
+two halves, down to the raw memories.
+
+### If you're a subagent: skip everything above
+
+Parallel sessions on this machine are all you, and may all write memories.
+A subagent is not: it must never run `memo`, because it cannot judge what
+is already known, and its notes would arrive duplicated and incorrectly.
+When you spawn one, write: `You are a subagent. Don't run memo.`
+"""
+
+
 def main():
     if not REQUIREMENTS.exists():
         print(f"✗ {REQUIREMENTS} 未找到")
@@ -40,7 +162,7 @@ def main():
 
     req = json.loads(REQUIREMENTS.read_text())
     system = platform.system()
-    
+
     print(f"=== corch-skills 安装器 ===")
     print(f"系统: {system}")
     print()
@@ -69,13 +191,17 @@ def main():
             elif system == "Linux":
                 run(["sudo", "apt-get", "install", "-y", pkg])
 
-    # 推荐 skill（需要手动启用）
+    # 工具依赖（OptMem）
+    print("--- 工具依赖 ---")
+    install_tools(req)
+
+    # 推荐 skill（Corch 内置）
     recommended = req.get("recommended", [])
     if recommended:
         print("\n=== 推荐 skill（Corch 内置，无需安装）===")
         print("以下能力是 Corch 系统内置的，在对话中直接使用即可：")
         for s in recommended:
-            print(f"  • {s['name']} — {s['description']}")
+            print(f"  • {s['name']}")
 
     print("\n=== 安装完成 ===")
     print(f"已安装 {len(req['skills'])} 个 skill")
