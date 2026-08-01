@@ -251,7 +251,6 @@ python3 /path/to/corch-skills/scripts/wordpress-credentials.py --get
 
 Same pattern as corch-digest:
 1. Check credentials (`--status`) → ask if missing → `--login`
->>>>>>> a7e54af (feat: shared WordPress credential manager — one-time auth, permanent save, used by corch-digest & corch-action)
 2. Select category (fieldwork / inspirations)
 3. Confirm before publish
 
