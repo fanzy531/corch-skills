@@ -226,10 +226,32 @@ curl -X POST --user "$WP_USER:$WP_PASSWORD" \
   "$WP_SITE/wp-json/clab/v1/publish-action"
 ```
 
+
+## WordPress 凭证管理
+
+发布前检查 `~/.corch/config.json` 中是否有 `wordpress` 字段（与 corch-digest 共享）：
+
+```bash
+python3 /path/to/corch-skills/scripts/wordpress-credentials.py --status
+```
+
+未配置时引导用户一次性认证：
+
+```bash
+python3 /path/to/corch-skills/scripts/wordpress-credentials.py --login
+```
+
+验证通过后永久保存（权限 600），后续发布无需重复输入。读取凭证：
+
+```bash
+python3 /path/to/corch-skills/scripts/wordpress-credentials.py --get
+```
+
 ## User interaction flow
 
 Same pattern as corch-digest:
-1. Check auth → ask if missing
+1. Check credentials (`--status`) → ask if missing → `--login`
+>>>>>>> a7e54af (feat: shared WordPress credential manager — one-time auth, permanent save, used by corch-digest & corch-action)
 2. Select category (fieldwork / inspirations)
 3. Confirm before publish
 

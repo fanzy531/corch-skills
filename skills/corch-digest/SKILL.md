@@ -292,3 +292,47 @@ python3 scripts/download_images.py <urls_json> <output_dir>
 ## References
 
 - `references/output-format.md` — Complete output spec covering HTML fragment (§1), plain-text 导读 (§2), plain-text metadata spec (§3), color tokens, custom class definitions, and checklist.
+
+## WordPress 发布（他山之石 voice CPT）
+
+文章处理完成后可选发布到 WordPress。发布前需配置 WordPress 凭证（一次性）。
+
+### 凭证管理
+
+首次发布时，检查 `~/.corch/config.json` 中是否有 `wordpress` 字段：
+
+```bash
+python3 /path/to/corch-skills/scripts/wordpress-credentials.py --status
+```
+
+未配置时，要求用户提供 WordPress 站点、用户名、应用密码并验证保存：
+
+```bash
+python3 /path/to/corch-skills/scripts/wordpress-credentials.py --login
+```
+
+凭证验证通过后永久保存到 `~/.corch/config.json`（权限 600），后续发布无需重复输入。
+
+### 读取凭证
+
+```bash
+python3 /path/to/corch-skills/scripts/wordpress-credentials.py --get
+```
+
+输出 JSON：`{"site": "...", "username": "...", "app_password": "..."}`。
+
+### 发布流程
+
+1. 检查凭证（`--status`），未配置则引导 `--login`
+2. 上传图片到媒体库：
+   ```bash
+   curl -X POST --user "$USER:$APP_PASSWORD" -F "file=@image.jpg" "$SITE/wp-json/wp/v2/media"
+   ```
+3. 构建 voice CPT payload（含 ACF 字段）
+4. 用户确认后发布：
+   ```bash
+   curl -X POST --user "$USER:$APP_PASSWORD" -H "Content-Type: application/json" \
+     -d @payload.json "$SITE/wp-json/clab/v1/publish-voice"
+   ```
+
+> 应用密码生成路径：WP 后台 → 用户 → 个人资料 → Application Passwords
