@@ -1,6 +1,6 @@
 ---
 name: corch-action
-version: 0.3.0
+version: 0.4.0
 description: Parse structured markdown project documents, convert to WordPress action CPT (实践现场) with all ACF fields (repeater, gallery, group), and publish. Use when the user provides a markdown project file and asks to publish it as an action article.
 ---
 
@@ -11,6 +11,8 @@ description: Parse structured markdown project documents, convert to WordPress a
 - **Input**: Local `.md` file path (structured project document)
 - **Images**: Co-located `图片和附件/` directory, or paths referenced in the MD
 - **Convention**: `{.gallery}` suffix on image references → `section_gallery` field; unmarked images → embedded in `section_body`
+
+所有命令在本技能目录下执行。脚本位于 `scripts/`，不要在命令中读取或打印 WordPress 应用密码。
 
 ## Workflow
 
@@ -24,7 +26,7 @@ Extract from the MD document:
 | `action_subtitle` | First paragraph or subtitle line |
 | `action_category` | `fieldwork` or `inspirations` (ask user if unclear) |
 | `action_location` | Text after "项目地点" or similar |
-| `action_period` | Date range in "项目时间" section → **YYYYMM01**（日默认1号） |
+| `action_period` | Date range in "项目时间" section → **YYYYMMDD**（日默认 01） |
 | `action_initiator` | "发起人" section |
 | `action_type` | Keywords from the opening metadata block |
 | `action_tags` | Tags/keywords listed in the document |
@@ -40,18 +42,18 @@ Each `## ` heading (excluding the document title and outcomes/appendix) becomes 
   "section_number": "01 // PROJECT OVERVIEW",
   "section_title": "项目概览",
   "section_body": "<p>... paragraphs with inline <img>...</p>",
-  "section_gallery": [21, 22]  ← media IDs for {.gallery} images
+  "section_gallery": [21, 22]
 }
 ```
+
+完整 ACF 映射、时间线组件和时间线识别规则见 [references/output-format.md](references/output-format.md)。
 
 ### 3. Parse images
 
 #### 3.1 `{.gallery}` 标记规则
 
-MD 文档中的图片引用有两种写法，决定图片在文章中的位置：
-
 ```markdown
-<!-- 嵌入正文：图片在 WYSIWYG body 的文字流中 -->
+<!-- 嵌入正文：图片在 section_body 的文字流中 -->
 ![社区活动照片](图片和附件/01.jpg)
 
 <!-- 放入画廊：缩略图网格 + lightbox -->
@@ -67,130 +69,88 @@ MD 文档中的图片引用有两种写法，决定图片在文章中的位置�
 
 #### 3.2 归属章节
 
-每张图片根据它在 MD 中出现的上下文，归属到**上一个 `## ` 标题**对应的 `action_sections` 项：
-
-- 图片出现在 `## 一、项目简介` 下方 → 归属 sections[0]
-- 图片出现在 `## 二、项目缘起` 下方 → 归属 sections[1]
-- 以此类推
+每张图片根据它在 MD 中出现的上下文，归属到**上一个 `## ` 标题**对应的 `action_sections` 项。
 
 #### 3.3 处理流程
 
-对文档中的每一张图片：
-
-1. 提取 alt 文本和路径：`![alt](path){.gallery}` → alt="alt", path="path", is_gallery=True
+1. 提取 alt 文本和路径：`![alt](path){.gallery}` → alt、path、is_gallery
 2. 根据 MD 中的位置确定归属章节
-3. 将本地路径映射为上传后的 WordPress 媒体 URL + ID
-4. 生成输出：
-   - **非 gallery 图片**：在 `section_body` 中插入 `<p><img src="media_url" alt="alt" style="width:100%;max-width:600px;height:auto;margin:12px 0;"></p>`
-   - **gallery 图片**：将 media ID 加入 `section_gallery` 数组
+3. 图片压缩后，将本地路径映射为上传后的 WordPress 媒体 URL + ID
+4. 非 gallery 图片在 `section_body` 中插入 `<p><img ...></p>`；gallery 图片将 media ID 加入 `section_gallery`
 
 #### 3.4 边缘情况
 
 | 情况 | 处理 |
 |---|---|
-| 图片在两个 `##` 之间（严格位于前一个章节文本之后、下一个 `##` 之前） | 归属到**前一个**章节 |
+| 图片在两个 `##` 之间 | 归属到**前一个**章节 |
 | 同一张图片被多次引用 | 只上传一次，复用 media ID 和 URL |
 | `{.gallery}` 写在 alt 内部而非路径末尾 | 不识别，按普通图片处理 |
-| 文档末尾、最后一个 `##` 之后的图片（如附录末尾） | 归属到最后一个章节 |
+| 文档末尾、最后一个 `##` 之后的图片 | 归属到最后一个章节 |
 | 图片文件不存在 | 跳过并输出警告，不中断流程 |
-
-#### 3.5 示例
-
-原始 MD：
-
-```markdown
-## 一、项目简介
-
-项目从社区的旧衣和裁缝铺出发...
-
-![旧衣收集现场](图片和附件/01.jpg)
-
-## 二、项目缘起
-
-始于一件2001年的手织毛衣...
-
-![大头毛衣](图片和附件/02.jpg)
-
-![展览海报](图片和附件/03.jpg){.gallery}
-```
-
-解析后 sections：
-
-```json
-{
-  "section_number": "01 // PROJECT OVERVIEW",
-  "section_title": "项目简介",
-  "section_body": "<p>项目从社区的旧衣和裁缝铺出发...</p><p><img src="...01.jpg" alt="旧衣收集现场"></p>",
-  "section_gallery": []
-},
-{
-  "section_number": "02 // BACKGROUND",
-  "section_title": "项目缘起",
-  "section_body": "<p>始于一件2001年的手织毛衣...</p><p><img src="...02.jpg" alt="大头毛衣"></p>",
-  "section_gallery": [84]
-}
-```
 
 ### 4. Optimize images
 
-Before uploading, run `scripts/optimize_images.py` on the image directory:
+在发布前压缩，保留原图：
 
 ```bash
-python3 scripts/optimize_images.py "图片和附件/"
+python3 scripts/optimize_images.py "图片和附件/" \
+  --output-dir "图片和附件/optimized/" \
+  --manifest "media-manifest.json"
 ```
 
-The script outputs a summary like:
+规则：
 
-```
-  ✓ 03.jpg: 4000x3000 → 1000x750 (landscape)  2100KB → 180KB
-  ✓ 07.jpg: 3000x4000 → 1200x1600 (portrait)  1800KB → 150KB
-  - 49 images skipped (already optimal)
-
-Optimized: 2  |  Skipped (already optimal): 49
-```
-
-**After compression, present the summary to the user and ask:**
-
-> 图片压缩完成：X 张已优化，Y 张跳过。
-> 
-> | 文件 | 原尺寸 | 压缩后 |
-> |---|---|---|
-> | 03.jpg | 4000x3000 | 1000x750, 180KB |
-> | 07.jpg | 3000x4000 | 1200x1600, 150KB |
-> 
-> 继续上传到媒体库？(y/N)
-
-Only proceed to upload on explicit confirmation.
-
-| Image type | Target width |
+| 类型 | 目标宽度 |
 |---|---|
-| Landscape (w > h) | 1000px |
-| Portrait (w ≤ h) | 1200px |
+| 横幅 (w > h) | 1200px |
+| 竖幅 (w ≤ h) | 1000px |
 
-- Only resize if current width exceeds target
-- Convert all to JPEG (quality 85, optimize=True)
-- Already-optimal JPGs are skipped
+- 只缩小，不放大
+- 统一转 JPEG，quality 85，optimize=True
+- 已是最优的 JPG 跳过
+- `--output-dir` 保持原图不动；`media-manifest.json` 记录 source → output 映射
 
-### 5. Upload images
+压缩完成后向用户展示统计表，确认后才继续上传。payload 中的图片路径一律指向压缩后的文件。
 
-Upload optimized images to WordPress media library:
+### 5. Credentials
+
+发布前检查凭证（与 corch-digest 共享 `~/.corch/config.json`）：
 
 ```bash
-curl -X POST --user "$WP_USER:$WP_PASSWORD" \
-  -F "file=@image.jpg" \
-  "$WP_SITE/wp-json/wp/v2/media"
+python3 scripts/corch_action.py status
 ```
 
-Collect returned media IDs for gallery and inline references.
+未配置时引导用户一次性认证：
 
-### 6. Build publish payload
+```bash
+python3 scripts/corch_action.py login
+```
+
+认证通过后永久保存（文件权限 600）。脚本内部读取凭证，**不要**把密码作为命令行参数；非交互环境使用 `--password-stdin`。
+
+### 6. Upload images
+
+上传压缩后的图片到 WordPress 媒体库：
+
+```bash
+python3 scripts/corch_action.py upload-media "图片和附件/optimized/01.jpg" "图片和附件/optimized/02.jpg" \
+  --map "media-map.json" \
+  --alt-map "alt-map.json"
+```
+
+- `media-map.json` 保存源文件哈希 → media ID/URL；重复执行自动复用，失败重试不会重复创建附件
+- `alt-map.json` 是 `{"图片路径": "alt 文本"}` 映射，来自 MD 中的 `![alt](path)`；没有映射时才用 `--alt` 兜底
+- 用返回的 `url` 替换 `section_body` 中的图片 src，用返回的 `id` 填充 gallery 字段
+- 上传失败时保留 map，只重试失败文件
+
+### 7. Build publish payload
 
 ```json
 {
   "title": "【关于穿的记忆】 社区参与式艺术实践",
   "content": "",
   "excerpt": "Brief project summary",
-  "status": "publish",
+  "status": "draft",
   "featured_media": 123,
   "acf": {
     "action_subtitle": "副标题",
@@ -204,84 +164,91 @@ Collect returned media IDs for gallery and inline references.
     "action_type": "项目类型",
     "action_tags": [{"tag": "标签1"}, {"tag": "标签2"}],
     "action_proposition": "核心价值主张",
-    "action_sections": [...],
-    "action_outcomes": [...],
-    "action_gallery": [...]
+    "action_sections": [],
+    "action_outcomes": [{"outcome_label": "01", "outcome_title": "成果标题", "outcome_desc": "成果说明"}],
+    "action_gallery": [{"gallery_image": 84, "gallery_caption": "展览现场"}]
   }
 }
 ```
 
-> **注意：** `date_picker` 字段 `period_start`/`period_end` 必须用 `Ymd` 格式（如 `20241101`；MD 只有年月时，日默认 01），不可用 `2024.11`、`202411` 或任何 strtotime 无法解析的格式
+> **注意：** `date_picker` 字段 `period_start`/`period_end` 必须用 8 位 `Ymd`（如 `20241101`；MD 只有年月时，日默认 01），不可用 `2024.11`、`202411` 或任何 `strtotime` 无法解析的格式。
 
-### 7. User confirm
+### 8. Validate and plan
 
-Present summary → select `action_category` (fieldwork / inspirations) → confirm
-
-### 8. Publish
+发布前必须本地校验，再展示计划：
 
 ```bash
-curl -X POST --user "$WP_USER:$WP_PASSWORD" \
-  -H "Content-Type: application/json" \
-  -d @payload.json \
-  "$WP_SITE/wp-json/clab/v1/publish-action"
+python3 scripts/corch_action.py validate payload.json
+python3 scripts/corch_action.py plan payload.json
 ```
 
+校验覆盖：必填字段、日期格式、HTML 中的 img alt/绝对 URL、gallery media ID、repeater 结构，以及 payload 中禁止出现凭证字段。校验失败时修复后重新执行，不要跳过。
 
-## WordPress 凭证管理
+### 9. User confirm
 
-发布前检查 `~/.corch/config.json` 中是否有 `wordpress` 字段（与 corch-digest 共享）：
+展示计划摘要 → 确认 `action_category`（fieldwork / inspirations）→ 确认发布状态。
+
+### 10. Publish
+
+默认发布为**草稿**：
 
 ```bash
-python3 /path/to/corch-skills/scripts/wordpress-credentials.py --status
+python3 scripts/corch_action.py publish payload.json
 ```
 
-未配置时引导用户一次性认证：
+正式发布必须同时满足：payload 中 `"status": "publish"`，且用户明确同意后加确认参数：
 
 ```bash
-python3 /path/to/corch-skills/scripts/wordpress-credentials.py --login
+python3 scripts/corch_action.py publish payload.json --confirm-publish
 ```
 
-验证通过后永久保存（权限 600），后续发布无需重复输入。读取凭证：
+### 11. Failure handling
 
-```bash
-python3 /path/to/corch-skills/scripts/wordpress-credentials.py --get
-```
+- `validate` 报错：按字段信息修复，重新 validate
+- `plan` 摘要与预期不符：停下来和用户核对，不要直接发布
+- 上传超时/部分成功：保留 `media-map.json`，只重试失败文件；不要删除已上传附件
+- 发布超时：先用返回的 `post_id` 或 wp-admin 查询结果，确认未创建再重试；不要盲目重复提交
+- 401/403：运行 `corch_action.py login` 重新认证，检查用户角色和 CPT 权限
+- 任何错误提示都可能包含响应内容：先脱敏再转述，不展示 Authorization 头或应用密码
 
 ## User interaction flow
 
-Same pattern as corch-digest:
-1. Check credentials (`--status`) → ask if missing → `--login`
-2. Select category (fieldwork / inspirations)
-3. Confirm before publish
+1. 检查凭证：`corch_action.py status`；缺失时引导 `login`，只认证一次
+2. 解析 MD，生成 payload 与图片清单
+3. 压缩图片，展示结果并确认
+4. 上传图片，生成 media map
+5. `validate` + `plan`，展示计划并确认
+6. 发布草稿，或经确认后正式发布
 
 ## Dependencies
 
-### Image processing: Pillow
-
-```bash
-pip install Pillow
-```
-
-### PDF extraction (if input is PDF)
-
-Same as corch-digest: poppler (pdftotext + pdfimages)
+- Python 3.10+
+- Pillow
+- 无需 curl 和外部凭证工具
 
 ## Scripts
 
+### `scripts/corch_action.py`
+
+安全发布 CLI，凭证只在脚本内部读取，不会输出到对话上下文：
+
+```text
+status         验证已保存的凭证
+login          交互式验证并保存凭证（永久保存，权限 600）
+validate       本地校验 payload（不访问网络）
+plan           校验并输出创建/更新计划
+upload-media   上传图片，支持 media map 复用
+publish        发布 action 文章
+```
+
 ### `scripts/optimize_images.py`
 
-Batch optimize images before upload:
+批量压缩图片并生成 source → output 映射：
 
+```text
+python3 scripts/optimize_images.py <images_dir> [--output-dir DIR] [--manifest FILE]
 ```
-python3 scripts/optimize_images.py <images_dir>
-```
-
-Scans all images in the directory, resizes according to landscape/portrait rules, converts to JPG, saves optimized versions.
-
-### `scripts/download_images.py`
-
-Same as corch-digest — reuse from corch-digest/skills.
 
 ## References
 
-- `references/output-format.md` — ACF field mapping and HTML body format
+- `references/output-format.md` — ACF field mapping, HTML body format, and timeline component

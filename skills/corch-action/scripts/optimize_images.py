@@ -1,92 +1,140 @@
 #!/usr/bin/env python3
-"""
-Optimize images for WordPress upload.
-- Landscape (w > h): resize width to 1000px
-- Portrait (w <= h): resize width to 1200px
-- Only resize if current width exceeds target
-- Convert all to JPEG (quality 85, optimize=True)
-- Already-optimal JPGs are skipped
+"""Optimize action images while keeping a source-to-output manifest.
+
+Landscape images use a 1200px target width; portrait and square images use
+1000px. JPEG quality is 85. Use --output-dir to keep originals untouched.
 """
 
+import argparse
+import json
 import os
-import sys
-from PIL import Image
+import tempfile
+from pathlib import Path
 
-LANDSCAPE_W = 1000
-PORTRAIT_W = 1200
+from PIL import Image, ImageOps
+
+
+LANDSCAPE_W = 1200
+PORTRAIT_W = 1000
 JPEG_QUALITY = 85
+SUPPORTED = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".tif", ".tiff"}
 
 
-def optimize_image(path):
-    """Compress a single image. Returns stats dict or None if skipped."""
+def output_path(source, source_root, output_root):
+    if output_root is None:
+        candidate = source.with_suffix(".jpg")
+        if candidate == source:
+            return candidate
+        if not candidate.exists():
+            return candidate
+        index = 1
+        while True:
+            candidate = source.with_name(f"{source.stem}-optimized{index if index > 1 else ''}.jpg")
+            if not candidate.exists():
+                return candidate
+            index += 1
+    relative = source.relative_to(source_root).with_suffix(".jpg")
+    return output_root / relative
+
+
+def prepare_rgb(image):
+    if image.mode in ("RGBA", "LA") or (image.mode == "P" and "transparency" in image.info):
+        rgba = image.convert("RGBA")
+        canvas = Image.new("RGB", rgba.size, "white")
+        canvas.paste(rgba, mask=rgba.getchannel("A"))
+        return canvas
+    if image.mode not in ("RGB", "L"):
+        return image.convert("RGB")
+    return image
+
+
+def save_atomic(image, target):
+    target.parent.mkdir(parents=True, exist_ok=True)
+    fd, temp_name = tempfile.mkstemp(prefix=f"{target.stem}.", suffix=".tmp", dir=target.parent)
+    os.close(fd)
     try:
-        img = Image.open(path)
-    except Exception as e:
-        print(f"  ✗ Cannot open {path}: {e}")
-        return None
+        image.save(temp_name, "JPEG", quality=JPEG_QUALITY, optimize=True)
+        os.replace(temp_name, target)
+    except Exception:
+        try:
+            os.unlink(temp_name)
+        except OSError:
+            pass
+        raise
 
-    w, h = img.size
-    is_landscape = w > h
-    target_w = LANDSCAPE_W if is_landscape else PORTRAIT_W
-    needs_resize = w > target_w
-    is_jpg = path.lower().endswith(('.jpg', '.jpeg'))
 
-    # Determine output path (force .jpg extension)
-    out_path = os.path.splitext(path)[0] + '.jpg'
-    if out_path == path and not needs_resize:
-        return None  # Already optimal
+def optimize_image(source, source_root, output_root):
+    try:
+        with Image.open(source) as opened:
+            image = ImageOps.exif_transpose(opened)
+            if getattr(image, "is_animated", False):
+                image.seek(0)
+            image.load()
+            width, height = image.size
+            target_width = LANDSCAPE_W if width > height else PORTRAIT_W
+            needs_resize = width > target_width
+            is_jpeg = source.suffix.lower() in {".jpg", ".jpeg"}
+            needs_conversion = not is_jpeg or image.mode not in ("RGB", "L")
+            target = output_path(source, source_root, output_root)
 
-    if needs_resize:
-        ratio = target_w / w
-        new_size = (target_w, int(h * ratio))
-        img = img.resize(new_size, Image.LANCZOS)
+            if output_root is None and target == source and not needs_resize and not needs_conversion:
+                return {"source": str(source), "output": str(source), "skipped": True,
+                        "from": f"{width}x{height}", "to": f"{width}x{height}"}
 
-    # Convert RGBA/P to RGB for JPEG
-    if img.mode in ('RGBA', 'P'):
-        img = img.convert('RGB')
-
-    img.save(out_path, 'JPEG', quality=JPEG_QUALITY, optimize=True)
-
-    orig_kb = os.path.getsize(path) // 1024
-    new_kb = os.path.getsize(out_path) // 1024
-    return {
-        'file': os.path.basename(path),
-        'from': f"{w}x{h}",
-        'to': f"{img.width}x{img.height}" if needs_resize else f"{w}x{h}",
-        'size': f"{orig_kb}KB → {new_kb}KB",
-    }
+            if needs_resize:
+                ratio = target_width / width
+                image = image.resize((target_width, max(1, int(height * ratio))), Image.Resampling.LANCZOS)
+            image = prepare_rgb(image)
+            save_atomic(image, target)
+            orig_kb = source.stat().st_size // 1024
+            new_kb = target.stat().st_size // 1024
+            size_text = f"{width}x{height} -> {image.width}x{image.height}"
+            return {"source": str(source), "output": str(target), "skipped": False,
+                    "from": f"{width}x{height}", "to": f"{image.width}x{image.height}",
+                    "size": size_text, "file_size": f"{orig_kb}KB -> {new_kb}KB"}
+    except Exception as exc:
+        return {"source": str(source), "error": str(exc)}
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python3 optimize_images.py <images_dir>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Optimize images for corch-action")
+    parser.add_argument("images_dir", help="directory containing source images")
+    parser.add_argument("--output-dir", help="write JPEGs here and keep source files unchanged")
+    parser.add_argument("--manifest", help="write source-to-output JSON mapping")
+    args = parser.parse_args()
 
-    img_dir = sys.argv[1]
-    if not os.path.isdir(img_dir):
-        print(f"Error: {img_dir} is not a directory")
-        sys.exit(1)
+    source_root = Path(args.images_dir).expanduser().resolve()
+    if not source_root.is_dir():
+        parser.error(f"not a directory: {source_root}")
+    output_root = Path(args.output_dir).expanduser().resolve() if args.output_dir else None
+    if output_root == source_root:
+        parser.error("--output-dir must differ from images_dir")
 
-    files = sorted(os.listdir(img_dir))
     results = []
-    skipped = 0
-
-    for fname in files:
-        path = os.path.join(img_dir, fname)
-        if not os.path.isfile(path):
+    for source in sorted(path for path in source_root.rglob("*") if path.is_file() and path.suffix.lower() in SUPPORTED):
+        if output_root and output_root in source.parents:
             continue
-        if not fname.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff')):
-            continue
-
-        result = optimize_image(path)
-        if result:
-            results.append(result)
-            print(f"  ✓ {result['file']}: {result['from']} → {result['to']}, {result['size']}")
+        result = optimize_image(source, source_root, output_root)
+        results.append(result)
+        relative = source.relative_to(source_root)
+        if "error" in result:
+            print(f"  x {relative}: {result['error']}")
+        elif result["skipped"]:
+            print(f"  - {relative}: already optimal")
         else:
-            skipped += 1
+            print(f"  + {relative}: {result['from']} -> {result['to']} ({result['file_size']}) => {result['output']}")
 
-    print(f"\nOptimized: {len(results)}  |  Skipped (already optimal): {skipped}")
+    if args.manifest:
+        manifest = Path(args.manifest).expanduser()
+        manifest.parent.mkdir(parents=True, exist_ok=True)
+        manifest.write_text(json.dumps({"version": 1, "images": results}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    failed = sum("error" in result for result in results)
+    optimized = sum(not result.get("skipped") and "error" not in result for result in results)
+    skipped = sum(result.get("skipped", False) for result in results)
+    print(f"\nOptimized: {optimized} | Skipped: {skipped} | Failed: {failed}")
+    return 1 if failed else 0
 
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    raise SystemExit(main())

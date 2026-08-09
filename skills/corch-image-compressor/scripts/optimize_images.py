@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Optimize images for WordPress upload.
-- Landscape (w > h): resize width to 1000px
-- Portrait (w <= h): resize width to 1200px
+- Landscape (w > h): resize width to 1200px
+- Portrait (w <= h): resize width to 1000px
 - Only resize if current width exceeds target
 - Convert all to JPEG (quality 85, optimize=True)
 - Already-optimal JPGs are skipped
@@ -12,8 +12,8 @@ import os
 import sys
 from PIL import Image
 
-LANDSCAPE_W = 1000
-PORTRAIT_W = 1200
+LANDSCAPE_W = 1200
+PORTRAIT_W = 1000
 JPEG_QUALITY = 85
 
 

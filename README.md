@@ -19,9 +19,11 @@ curl -sL https://raw.githubusercontent.com/fanzy531/corch-skills/main/scripts/in
 | **corch-digest** | 读取文章URL → 消化改写 → 发布到「他山之石」 | voice CPT |
 | **corch-action** | 解析项目MD文档 → 发布到「实践现场」 | action CPT |
 | **corch-hub** | 社区营造知识库问答 | — |
-| **corch-image-compressor** | 批量压缩图片（横幅1000w/竖幅1200w→JPG） | — |
+| **corch-image-compressor** | 批量压缩图片（横幅1200w/竖幅1000w→JPG） | — |
 | **corch-translate-helper** | 外文→中文翻译，保持术语一致 | — |
 | **corch-interview-notes** | 访谈录音/笔记→结构化可发布内容 | — |
+
+`corch-action` 内置安全发布 CLI（login / status / validate / plan / upload-media / publish），凭证保存在 `~/.corch/config.json`（权限 600），不会输出到对话上下文。
 
 ### 外部源（9 个，自动安装）
 

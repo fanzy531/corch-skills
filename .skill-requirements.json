@@ -4,38 +4,38 @@
   "skills": [
     {
       "name": "corch-digest",
-      "path": "skills/corch-digest/SKILL.md",
+      "path": "skills/corch-digest",
       "description": "转载文献 → voice CPT"
     },
     {
       "name": "corch-action",
-      "path": "skills/corch-action/SKILL.md",
+      "path": "skills/corch-action",
       "description": "项目文档 → action CPT"
     },
     {
       "name": "corch-hub",
-      "path": "skills/corch-hub/SKILL.md",
+      "path": "skills/corch-hub",
       "description": "社区营造知识库问答"
     },
     {
       "name": "corch-image-compressor",
-      "path": "skills/corch-image-compressor/SKILL.md",
+      "path": "skills/corch-image-compressor",
       "description": "批量压缩图片"
     },
     {
       "name": "corch-translate-helper",
-      "path": "skills/corch-translate-helper/SKILL.md",
+      "path": "skills/corch-translate-helper",
       "description": "外文→中文翻译"
     },
     {
       "name": "corch-interview-notes",
-      "path": "skills/corch-interview-notes/SKILL.md",
+      "path": "skills/corch-interview-notes",
       "description": "访谈→结构化笔记"
     },
     {
       "name": "humanizer-zh",
       "source": "op7418/Humanizer-zh",
-      "path": "SKILL.md",
+      "path": ".",
       "description": "去除中文文本AI痕迹"
     },
     {
@@ -47,19 +47,19 @@
     {
       "name": "content-risk-detector",
       "source": "liuxingqitd/content-risk-detector",
-      "path": "SKILL.md",
+      "path": ".",
       "description": "发布前合规审查"
     },
     {
       "name": "guizang-social-card-skill",
       "source": "op7418/guizang-social-card-skill",
-      "path": "SKILL.md",
+      "path": ".",
       "description": "小红书图文+公众号封面生成（28布局）"
     },
     {
       "name": "html-ppt",
       "source": "lewislulu/html-ppt-skill",
-      "path": "SKILL.md",
+      "path": ".",
       "description": "HTML PPT 演示制作（24主题31布局）"
     },
     {

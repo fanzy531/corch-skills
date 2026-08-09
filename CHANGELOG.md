@@ -1,5 +1,20 @@
 # 更新日志
 
+## 2.7.0 (2026-08-09)
+
+### 新增
+- corch-action 内置安全发布 CLI：login / status / validate / plan / upload-media / publish
+- 图片压缩支持 `--output-dir` 与 manifest，失败重试不会重复上传附件
+- 发布前本地校验 payload：必填字段、日期格式、HTML 图片、gallery ID、repeater 结构
+
+### 变更
+- 图片压缩规则统一为横幅 1200px、竖幅 1000px（corch-action 与 corch-image-compressor）
+- 正式发布需 payload `status: publish` + `--confirm-publish`，默认只发布草稿
+- WordPress 应用密码不再通过 `--get` 输出到 agent 上下文
+
+### 修复
+- 安装清单路径改为技能目录，修复新机器无法通过 install.py 安装的问题
+
 ## 2.6.0 (2026-07-31)
 
 ### 新增
